@@ -1,0 +1,13 @@
+[project]
+name = "pyside-sockets"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "basedpyright>=1.29.2",
+    "isort>=6.0.1",
+    "pyside6>=6.9.0",
+    "pytest>=8.3.5",
+    "pytest-qt>=4.4.0",
+]
