@@ -9,11 +9,9 @@ class RequestClient(ClientBase):
         self, address: QHostAddress, port: int, parent: QObject | None = None
     ) -> None:
         super().__init__(address=address, port=port, parent=parent)
-        self.msgsig.emit(self._register())
-        self._register()
 
-    def _register(self) -> str:
-        return self._make_req("Hello, I would like to register please!")
+    def morning(self, num: int) -> str:
+        return self._make_req(f"'Morning!' #{num}")
 
     def _make_req(self, message: str) -> str:
         self.send(message)

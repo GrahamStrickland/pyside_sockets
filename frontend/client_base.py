@@ -54,7 +54,7 @@ class ClientBase(QObject):
 
             msg_recvd = False
             while not msg_recvd:
-                bytes = self._socket.read(msg_sz_bytes - bbuff.length())
+                bytes = self._socket.read(msg_sz - bbuff.length())
                 bbuff.append(bytes)
 
                 if bbuff.length() == msg_sz:
@@ -63,7 +63,7 @@ class ClientBase(QObject):
                     bbuff.clear()
                     msg_recvd = True
                 else:
-                    if not self._socket.waitForReadyRead(1000):
+                    if not self._socket.waitForReadyRead():
                         self.errsig.emit("Missing packet")
                         return
 

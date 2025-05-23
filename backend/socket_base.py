@@ -1,15 +1,19 @@
 import socket
 
+from .utils import console_out, l2bin
+
 
 class SocketBase:
-    MSGLEN = 4096
+    BUFFSZ = 4096
 
     _socket: socket.socket
     _client: socket.socket
+    _name: str
     _port: int
     _addr: int
 
-    def __init__(self, port: int) -> None:
+    def __init__(self, name: str, port: int) -> None:
+        self._name = name
         self._port = port
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -19,17 +23,17 @@ class SocketBase:
         self._client, self._addr = self._socket.accept()
 
     def send(self, msg: str) -> None:
-        print(f"sending on address {self._addr}")
-
         totalsent = 0
-        while totalsent < self.MSGLEN:
-            sent = self._client.send(msg)
+        bmsg = b"".join((l2bin(msg), bytes(msg, encoding="utf-8")))
+        console_out(f"{self._name} sending {bmsg} on address {self._addr}")
+        while totalsent < len(bmsg):
+            sent = self._client.send(bmsg)
             if sent == 0:
-                raise RuntimeError("socket connection broken")
+                raise RuntimeError("socket connection broken while sending")
             totalsent = totalsent + sent
 
     def recv(self) -> bytes:
-        print(f"receiving on address {self._addr}")
+        console_out(f"{self._name} receiving on address {self._addr}")
 
         chunks = []
         bytes_recvd = 4
@@ -37,13 +41,16 @@ class SocketBase:
         msg_sz = int.from_bytes(bytes, byteorder="little", signed=True)
 
         while bytes_recvd < msg_sz:
-            chunk = self._client.recv(min(msg_sz - bytes_recvd, self.MSGLEN))
+            chunk = self._client.recv(min(msg_sz - bytes_recvd, self.BUFFSZ))
             if chunk == b"":
-                raise RuntimeError("socket connection broken")
+                raise RuntimeError("socket connection broken while receiving")
             chunks.append(chunk)
             bytes_recvd = bytes_recvd + len(chunk)
 
-        return b"".join(chunks)
+        bmsg = b"".join(chunks)
+        console_out(f"{self._name} received {bmsg} on address {self._addr}")
+
+        return bmsg
 
     def disconnect(self) -> None:
         self._socket.close()
