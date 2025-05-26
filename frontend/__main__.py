@@ -1,28 +1,45 @@
 import sys
 
+import pydevd
 from PySide6.QtCore import QThread
 from PySide6.QtWidgets import QApplication
 
 from frontend.window import Window
-from frontend.worker_object import WorkerObject
+from frontend.request_manager import RequestManager
+from frontend.update_manager import UpdateManager
+
+
+pydevd.connected = True
+pydevd.settrace(suspend=False)
 
 
 def main() -> None:
     app = QApplication(sys.argv)
 
     window = Window()
-    worker_thread = QThread()
-    worker_object = WorkerObject()
-    worker_object.moveToThread(worker_thread)
-    worker_thread.finished.connect(worker_object.deleteLater)
-    app.aboutToQuit.connect(worker_thread.quit)
 
-    worker_object.msgsig.connect(window.display_msg)
-    worker_object.errsig.connect(window.display_msg)
+    request_thread = QThread()
+    request_manager = RequestManager()
+    request_manager.moveToThread(request_thread)
+    request_thread.finished.connect(request_manager.deleteLater)
+    request_manager.msgsig.connect(window.display_msg)
+    request_manager.errsig.connect(window.display_msg)
+
+    update_thread = QThread()
+    update_manager = UpdateManager()
+    update_manager.moveToThread(update_thread)
+    update_thread.finished.connect(update_manager.deleteLater)
+    update_manager.msgsig.connect(window.display_msg)
+    update_manager.errsig.connect(window.display_msg)
+
+    app.aboutToQuit.connect(request_thread.quit)
+    app.aboutToQuit.connect(update_thread.quit)
 
     window.show()
-    window.startsig.connect(worker_object.do_work)
-    worker_thread.start()
+    window.startsig.connect(request_manager.do_work)
+    window.startsig.connect(update_manager.do_work)
+    request_thread.start()
+    update_thread.start()
 
     app.exec()
 

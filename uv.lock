@@ -76,12 +76,27 @@ wheels = [
 ]
 
 [[package]]
+name = "pydevd"
+version = "3.3.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/34/27/eb05f8c3205f469e41172ae8b1c3a8be4c609b2bb60c037279bba542412b/pydevd-3.3.0.tar.gz", hash = "sha256:aa4bdb74c5e21bde8f396c5055f5e34b0a23a359ec1cc44c6b25282adc9c3f50", size = 1330240, upload-time = "2025-02-01T13:14:07.128Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c9/9b/ac02fde7252570d7de383dd3d7ae9fe25341fdf3a6d5af7efb8cdb831a4e/pydevd-3.3.0-cp313-cp313-macosx_14_0_universal2.whl", hash = "sha256:21506d009947e4766953ee80ae2b7806bb8144d9da2151408a60e727e19dcf24", size = 2670219, upload-time = "2025-02-01T13:12:12.043Z" },
+    { url = "https://files.pythonhosted.org/packages/69/e1/7fbd827ada3ca8e880cdf5e94ddbb5a09c99f437033306ef8d7becb44467/pydevd-3.3.0-cp313-cp313-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:6a779970f39580a84e48aec5ad1cd60ad59c5e7b820d31dae058427fb71a8747", size = 4325389, upload-time = "2025-02-01T13:32:45.907Z" },
+    { url = "https://files.pythonhosted.org/packages/a7/90/d24dd2287a4b71e64ecc15dab9559ad21900cf6d8ff209872f5a3bfa11b4/pydevd-3.3.0-cp313-cp313-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:206232066a737bdc1ea27e46a61356a8b0cfdbfd3befe667aed2ba267102f72b", size = 4480684, upload-time = "2025-02-01T13:32:48.496Z" },
+    { url = "https://files.pythonhosted.org/packages/23/20/e6fd0dde2326d1093cd793403b6dd198c82dc4d95c40668b4de7d14d6052/pydevd-3.3.0-cp313-cp313-musllinux_1_2_i686.whl", hash = "sha256:8f61b3fbc1b1da52bd16289cf89f7b621c28787e3a6134285d85d79aa43d6fcb", size = 5434956, upload-time = "2025-02-01T13:32:50.283Z" },
+    { url = "https://files.pythonhosted.org/packages/b7/50/98ac5d8332051d34695b73bc4c01ba6b1ba5d39bcec9f9c185117bc137fb/pydevd-3.3.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:6cc982957d6c75fe42c14a15793ce812a5acc6a4f9baf88785d150a4cdc267b0", size = 5449451, upload-time = "2025-02-01T13:32:52.202Z" },
+    { url = "https://files.pythonhosted.org/packages/e6/65/23405d2590bf60e1b09bd979acc77a4da6f95c7879cbe1ada93f45fec9c4/pydevd-3.3.0-cp313-cp313-win_amd64.whl", hash = "sha256:77d5e8688ddca31a8d342baf3d37b39db3c6c5e639f65f66ae58b9bc6dc47637", size = 2291685, upload-time = "2025-02-01T13:13:04.33Z" },
+]
+
+[[package]]
 name = "pyside-sockets"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "basedpyright" },
     { name = "isort" },
+    { name = "pydevd" },
     { name = "pyside6" },
     { name = "pytest" },
     { name = "pytest-qt" },
@@ -91,6 +106,7 @@ dependencies = [
 requires-dist = [
     { name = "basedpyright", specifier = ">=1.29.2" },
     { name = "isort", specifier = ">=6.0.1" },
+    { name = "pydevd", specifier = ">=3.3.0" },
     { name = "pyside6", specifier = ">=6.9.0" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-qt", specifier = ">=4.4.0" },
