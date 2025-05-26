@@ -24,7 +24,8 @@ def req_jobs() -> None:
             msgno += 1
             pi = pi_approx(10*msgno)
             req_sock.send(str(msg) + f": {pi}")
-            if msg == "Morning! #2":
+            if str(msg) == 'b"\'Morning!\' #10"':
+                console_out("Done receiving/sending on Request Socket")
                 break
                 
     except RuntimeError as e:

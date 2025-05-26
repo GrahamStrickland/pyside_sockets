@@ -29,7 +29,7 @@ class SocketBase:
         while totalsent < len(bmsg):
             sent = self._client.send(bmsg)
             if sent == 0:
-                raise RuntimeError("socket connection broken while sending")
+                raise RuntimeError("Socket connection broken while sending")
             totalsent = totalsent + sent
 
     def recv(self) -> bytes:
@@ -43,12 +43,11 @@ class SocketBase:
         while bytes_recvd < msg_sz:
             chunk = self._client.recv(min(msg_sz - bytes_recvd, self.BUFFSZ))
             if chunk == b"":
-                raise RuntimeError("socket connection broken while receiving")
+                raise RuntimeError("Socket connection broken while receiving")
             chunks.append(chunk)
             bytes_recvd = bytes_recvd + len(chunk)
 
         bmsg = b"".join(chunks)
-        console_out(f"{self._name} received {bmsg} on address {self._addr}")
 
         return bmsg
 

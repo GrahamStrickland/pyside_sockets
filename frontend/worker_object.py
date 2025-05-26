@@ -1,11 +1,11 @@
-from PySide6.QtCore import QObject, QThread, Signal
+from PySide6.QtCore import QObject, Signal
 from PySide6.QtNetwork import QHostAddress
 
 from .request_client import RequestClient
 from .update_client import UpdateClient
 
 
-class WorkerThread(QThread):
+class WorkerObject(QObject):
     _req_client: RequestClient
     _upd_client: UpdateClient
 
@@ -20,7 +20,7 @@ class WorkerThread(QThread):
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
 
-    def run(self) -> None:
+    def do_work(self) -> None:
         self._req_client = RequestClient(address=self._req_addr, port=self._req_port)
         self._req_client.errsig.connect(self.display_err)
         self._req_client.msgsig.connect(self.display_msg)
@@ -29,14 +29,14 @@ class WorkerThread(QThread):
         self._upd_client.errsig.connect(self.display_err)
         self._upd_client.msgsig.connect(self.display_msg)
 
-        for num in range(2):
-            self._req_client.morning(num)
-
-        return super().run()
+        for num in range(1, 11):
+            msgs = self._req_client.morning(num)
+            for msg in msgs:
+                self.msgsig.emit(msg)
 
     def display_msg(self, msg: str) -> None:
         self.msgsig.emit(
-            msg + ", from " + ", from " + self._get_sender_name(self.sender())
+            msg + ", from " + self._get_sender_name(self.sender())
         )
 
     def display_err(self, msg: str) -> None:

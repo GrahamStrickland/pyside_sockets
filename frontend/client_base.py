@@ -22,8 +22,10 @@ class ClientBase(QObject):
 
     def send(self, message: str, timeout: int = 50) -> None:
         if self._socket.state() != QAbstractSocket.SocketState.ConnectedState:
+            self.errsig.emit("Socket not connected")
             self._connect(self._address, self._port)
 
+        self.msgsig.emit(f"Sending message {message}")
         msg_bytes = bytes(message, "utf-8")
         sz_bytes = (len(msg_bytes) + 4).to_bytes(4, byteorder="little", signed=True)
         barr = bytearray(sz_bytes)
@@ -35,15 +37,12 @@ class ClientBase(QObject):
 
     def recv(self, timeout: int | None = 2000) -> str | list:
         if self._socket.state() != QAbstractSocket.SocketState.ConnectedState:
+            self.errsig.emit("Socket not connected")
             self._connect(self._address, self._port)
 
         msg_sz = -1
         bbuff = QByteArray()
         messages = []
-
-        if msg_sz == -1 and not self._socket.waitForReadyRead(timeout):
-            self.errsig.emit(self._socket.errorString())
-            return
 
         while True:
             msg_sz_bytes = self._socket.read(4)
@@ -58,7 +57,7 @@ class ClientBase(QObject):
                 bbuff.append(bytes)
 
                 if bbuff.length() == msg_sz:
-                    message = str(bbuff, "utf-8")
+                    message = str(bbuff, encoding="utf-8")
                     messages.append(message)
                     bbuff.clear()
                     msg_recvd = True
