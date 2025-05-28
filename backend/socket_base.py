@@ -4,7 +4,7 @@ from .utils import console_out, l2bin
 
 
 class SocketBase:
-    BUFFSZ = 4096
+    BUFFSZ = 16384
 
     _socket: socket.socket
     _client: socket.socket
