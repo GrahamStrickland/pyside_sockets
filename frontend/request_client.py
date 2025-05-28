@@ -10,9 +10,6 @@ class RequestClient(ClientBase):
     ) -> None:
         super().__init__(address=address, port=port, parent=parent)
 
-    def morning(self, num: int) -> str:
-        return self._make_req(f"'Morning!' #{num}")
-
-    def _make_req(self, message: str) -> str:
+    def make_req(self, message: str) -> str:
         self.send(message)
         return self.recv()

@@ -23,7 +23,8 @@ class ClientBase(QObject):
     def send(self, message: str, timeout: int = 50) -> None:
         if self._socket.state() != QAbstractSocket.SocketState.ConnectedState:
             self.errsig.emit("Socket not connected")
-            self._connect(self._address, self._port)
+            if not self._connect(self._address, self._port):
+                return
 
         self.msgsig.emit(f"Sending message {message}")
         msg_bytes = bytes(message, "utf-8")
@@ -35,10 +36,11 @@ class ClientBase(QObject):
             self.errsig.emit(self._socket.errorString())
             return
 
-    def recv(self, timeout: int | None = 2000) -> str | list:
+    def recv(self) -> str | list:
         if self._socket.state() != QAbstractSocket.SocketState.ConnectedState:
             self.errsig.emit("Socket not connected")
-            self._connect(self._address, self._port)
+            if not self._connect(self._address, self._port):
+                return []
 
         msg_sz = -1
         bbuff = QByteArray()
@@ -64,9 +66,9 @@ class ClientBase(QObject):
                 else:
                     if not self._socket.waitForReadyRead():
                         self.errsig.emit("Missing packet")
-                        return
+                        return []
 
-    def _connect(self, address: QHostAddress, port: int) -> None:
+    def _connect(self, address: QHostAddress, port: int) -> bool:
         self._socket.connectToHost(
             address.toString(),
             port,
@@ -75,4 +77,9 @@ class ClientBase(QObject):
         )
         if not self._socket.waitForConnected(1000):
             self.errsig.emit(self._socket.errorString())
-            raise ConnectionError(self._socket.errorString())
+            return False
+
+        return True
+
+    def quit(self) -> None:
+        self.send("quit")

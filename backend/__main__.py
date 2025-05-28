@@ -1,8 +1,9 @@
 import threading
+from random import random
 from queue import Queue
 
 from .socket_base import SocketBase
-from .utils import console_out
+from .utils import console_out, pi_approx
 
 
 def socket_loop(name: str, port: int, queue: Queue, queue_lock: threading.Lock) -> None:
@@ -12,22 +13,22 @@ def socket_loop(name: str, port: int, queue: Queue, queue_lock: threading.Lock) 
     try:
         msg = b""
         while True:
-            if len(msg := sock.recv()) > 0:
-                if msg == b"quit":
-                    console_out(f"Qutting {name}...")
-                    sock.disconnect()
-                    return
-                else:
-                    with queue_lock:
-                        queue.put(str(msg))
-
-            if len(msg) > 0 or name == "Update Socket":
-                with queue_lock:
-                    if queue.empty():
-                        continue
+            with queue_lock:
+                if len(msg := sock.recv()) > 0:
+                    if msg == b"quit":
+                        console_out(f"Qutting {name}...")
+                        sock.disconnect()
+                        return
                     else:
-                        msg = queue.get()
-                        sock.send(msg)
+                        console_out(f"{name} received '{msg}'")
+                        queue.put(str(msg))
+                elif not queue.empty():
+                    msg = queue.get()
+                    console_out(f"{name} sent '{msg}'")
+                    sock.send(msg)
+
+            for b in msg:
+                pi_approx(int(random() * 2**b))
 
     except RuntimeError as e:
         console_out(f"ERROR: On {name}, {e}")
@@ -56,25 +57,30 @@ def main() -> None:
     console_out("Starting update thread...")
     updt.start()
 
-    msg_recvd = 0
-    upd_messages = ["Hello", "ERROR!"]
-
+    msg_recvd = False
+    msg = ""
     while True:
+        for ch in msg:
+            pi_approx(int(random() * 2 ** ord(ch)))
+
         with req_queue_lock:
             if not req_queue.empty():
+                msg_recvd = True
                 msg = req_queue.get()
                 console_out(msg)
-                req_queue.put(f"Response to {msg} from Request Socket")
-                msg_recvd += 1
+                msg = f"Hello! Thanks for your msg '{msg}'. How are you?"
+                console_out(f"Writing message '{msg}'...")
+                req_queue.put(msg)
 
         with upd_queue_lock:
-            if msg_recvd > 2:
-                if not upd_queue.empty():
-                    msg = upd_queue.get()
-                    console_out(msg)
-                if len(upd_messages) > 0:
-                    msg = upd_messages.pop()
-                    upd_queue.put(f"Message {msg} from Update Socket")
+            if not upd_queue.empty():
+                msg = upd_queue.get()
+                console_out(msg)
+            elif msg_recvd:
+                msg = "Please read my messages!"
+                console_out(f"Writing message '{msg}'...")
+                upd_queue.put(msg)
+                msg_recvd = False
 
     try:
         reqt.join()
